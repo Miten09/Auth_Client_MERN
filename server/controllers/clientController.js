@@ -3,6 +3,7 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const ClientData = require("../models/client_dashboard_model");
 
 const securePassword = async (password) => {
   try {
@@ -82,9 +83,53 @@ const login_router = async (req, res) => {
 };
 
 const allclient = async (req, res) => {
-  const allclient = await User.find();
-  console.log(req.rootUser);
-  res.send(req.rootUser);
+  const { name, role, email, phone, city } = req.body;
+  if (!name || !role || !email || !phone || !city) {
+    return res.status(401).send({ error: "Plzz fill all fields" });
+  }
+  try {
+    const existingEmail = await ClientData.findOne({ email });
+    if (existingEmail) {
+      return res
+        .status(403)
+        .send({ error: "This email already exists try another one" });
+    } else {
+      const createClientData = new ClientData({
+        name,
+        role,
+        email,
+        phone,
+        city,
+      });
+      if (!createClientData) {
+        return res.status(404).send({ error: "No Client Found" });
+      } else {
+        const data = await createClientData.save();
+        res.status(200).send(data);
+      }
+    }
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
+const showclient = async (req, res) => {
+  try {
+    const showclientData = await ClientData.find();
+    res.status(200).send({ data: showclientData });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
+const deleteClient = async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const deleteData = await ClientData.findByIdAndDelete({ _id });
+    res.status(200).send({ data: deleteData });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 };
 
 const logout = async (req, res) => {
@@ -98,5 +143,7 @@ module.exports = {
   register_router,
   login_router,
   allclient,
+  showclient,
   logout,
+  deleteClient,
 };
