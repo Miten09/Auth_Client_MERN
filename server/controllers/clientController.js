@@ -83,8 +83,8 @@ const login_router = async (req, res) => {
 };
 
 const allclient = async (req, res) => {
-  const { name, role, email, phone, city } = req.body;
-  if (!name || !role || !email || !phone || !city) {
+  const { name, role, email, contact } = req.body;
+  if (!name || !role || !email || !contact) {
     return res.status(401).send({ error: "Plzz fill all fields" });
   }
   try {
@@ -98,8 +98,7 @@ const allclient = async (req, res) => {
         name,
         role,
         email,
-        phone,
-        city,
+        contact,
       });
       if (!createClientData) {
         return res.status(404).send({ error: "No Client Found" });
@@ -132,6 +131,16 @@ const deleteClient = async (req, res) => {
   }
 };
 
+const editClient = async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const showEditData = await ClientData.findById({ _id });
+    res.status(200).send({ data: showEditData });
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
 const logout = async (req, res) => {
   res.clearCookie("jwtoken", { path: "/" });
   res.status(201).json({
@@ -146,4 +155,5 @@ module.exports = {
   showclient,
   logout,
   deleteClient,
+  editClient,
 };

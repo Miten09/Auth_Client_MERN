@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  Box,
   Button,
   Table,
   TableBody,
@@ -34,6 +35,8 @@ const ClientDashboard = () => {
   }));
 
   const [state, setstate] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [editData, setEditData] = useState([]);
   const navigate = useNavigate();
 
   async function fetchData() {
@@ -69,13 +72,30 @@ const ClientDashboard = () => {
     }
   }
 
+  async function handleEdit(val) {
+    setOpenModal(true);
+    const res = await fetch(`/api/editclient/${val}`, {
+      method: "GET",
+      headerd: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    setEditData(data.data);
+  }
+
   useEffect(() => {
     fetchData();
-  }, [state]);
+  }, []);
 
   return (
     <>
-      <Modal />
+      <Modal
+        data={editData}
+        show={openModal}
+        close={() => setOpenModal(false)}
+        open={() => setOpenModal(true)}
+      />
       <TableContainer sx={{ marginTop: "50px" }}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
@@ -90,6 +110,8 @@ const ClientDashboard = () => {
           <TableBody>
             {state.map((val, index) => (
               <StyledTableRow key={val.name}>
+                {/* {console.log(index)} */}
+                {console.log(val.contact)}
                 <StyledTableCell component="th" scope="row" sx={{ pl: 6 }}>
                   {val.name}
                 </StyledTableCell>
@@ -98,20 +120,36 @@ const ClientDashboard = () => {
                 </StyledTableCell>
                 <StyledTableCell align="center">{val.email}</StyledTableCell>
                 <StyledTableCell align="center">
-                  {index + 1 == 0 ? "" : `${val.phone},${val.city}`}
+                  <div>
+                    {val?.contact?.map((val, index) => {
+                      return (
+                        <div style={{ display: "flex" }}>
+                          <p>{val.city}</p> &nbsp;&nbsp; &nbsp;&nbsp;
+                          <p>{val.phone}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </StyledTableCell>
-                <Button sx={{ p: 0.5 }} color="secondary" variant="contained">
-                  Edit
-                </Button>
-                &nbsp;&nbsp;
-                <Button
-                  sx={{ p: 0.5 }}
-                  variant="contained"
-                  color="error"
-                  onClick={() => deleteData(val._id)}
-                >
-                  Delete
-                </Button>
+                <Box textAlign="center">
+                  <Button
+                    sx={{ p: 0.5 }}
+                    color="secondary"
+                    variant="contained"
+                    onClick={() => handleEdit(val._id)}
+                  >
+                    Edit
+                  </Button>
+                  &nbsp;&nbsp;
+                  <Button
+                    sx={{ p: 0.5 }}
+                    variant="contained"
+                    color="error"
+                    onClick={() => deleteData(val._id)}
+                  >
+                    Delete
+                  </Button>
+                </Box>
               </StyledTableRow>
             ))}
           </TableBody>

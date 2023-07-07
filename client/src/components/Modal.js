@@ -5,29 +5,31 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { InputLabel, MenuItem, Select } from "@mui/material";
+import { IconButton, InputLabel, MenuItem, Select } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import { useState, useEffect } from "react";
-import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddBoxRoundedIcon from "@mui/icons-material/AddBoxRounded";
 
-export default function Modal() {
-  const [open, setOpen] = useState(false);
+export default function Modal({ show, close, open, data }) {
   const [role, setRole] = useState("");
   const [clientData, setClientData] = useState({
     name: "",
     role: [],
     email: "",
+    contact: [
+      {
+        city: "",
+        phone: "",
+      },
+    ],
   });
 
-  const [phone, setPhone] = useState([]);
-  const [city, setCity] = useState([]);
+  // const [phone, setPhone] = useState([]);
+  // const [city, setCity] = useState([]);
 
   const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
+    open();
   };
 
   const handleDropdownChange = (event) => {
@@ -35,8 +37,9 @@ export default function Modal() {
   };
 
   function handleOpenContactInfo() {
-    setPhone([...phone, ""]);
-    setCity([...city, ""]);
+    // setPhone([...phone, ""]);
+    // setCity([...city, ""]);
+    setClientData.contact([...clientData.contact, ""]);
   }
 
   function handleChange(e) {
@@ -46,7 +49,7 @@ export default function Modal() {
   }
 
   async function handleSubmit() {
-    const { name, role, email } = clientData;
+    const { name, role, email, contact } = clientData;
 
     const res = await fetch("/api/addclient", {
       method: "POST",
@@ -56,8 +59,7 @@ export default function Modal() {
         name,
         role,
         email,
-        phone,
-        city,
+        contact,
       }),
     });
     const data = await res.json();
@@ -67,35 +69,70 @@ export default function Modal() {
       window.alert("This email is already exists try another one");
     } else {
       window.alert("Data Added successfully");
-      setOpen(false);
+      close();
     }
   }
 
-  function handlephoneChange(e, index) {
+  function handleContactChange(e, index) {
     let text = e.target.value;
-    let dummy = phone;
+    let dummy = clientData.contact;
 
     dummy[index] = text;
-    setPhone(() => [...dummy]);
+    setClientData.contact(() => [...dummy]);
   }
 
-  function handleCityChange(e, index) {
-    let text = e.target.value;
-    let dummy = city;
+  // function handlephoneChange(e, index) {
+  //   let text = e.target.value;
+  //   let dummy = phone;
 
-    dummy[index] = text;
-    setCity(() => [...dummy]);
+  //   dummy[index] = text;
+  //   setPhone(() => [...dummy]);
+  // }
+
+  // function handleCityChange(e, index) {
+  //   let text = e.target.value;
+  //   let dummy = city;
+
+  //   dummy[index] = text;
+  //   setCity(() => [...dummy]);
+  // }
+
+  // function handleDelete(index) {
+  //   setCity((olditems) => {
+  //     return city.filter((val, i) => {
+  //       return index !== i;
+  //     });
+  //   });
+  //   setPhone((olditems) => {
+  //     return phone.filter((val, i) => {
+  //       return index !== i;
+  //     });
+  //   });
+  // }
+
+  function handleDelete(index) {
+    setClientData.contact((olditems) => {
+      return clientData.contact.filter((val, i) => {
+        return index !== i;
+      });
+    });
   }
 
   useEffect(() => {
     handleOpenContactInfo();
+    if (data.length > 0) {
+      setClientData(data);
+    }
   }, []);
+
+  console.log(data);
+
   return (
     <div>
       <Button variant="contained" onClick={handleClickOpen} sx={{ mt: 3 }}>
         Add Client
       </Button>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={show} onClose={close}>
         <DialogTitle>Add Account</DialogTitle>
         <DialogContent sx={{ width: { sm: 500 } }}>
           <TextField
@@ -165,6 +202,7 @@ export default function Modal() {
                 );
               })}
             </div>
+            &nbsp;&nbsp; &nbsp;&nbsp;
             <div>
               {city.map((value, index) => {
                 return (
@@ -178,7 +216,7 @@ export default function Modal() {
                         name="city"
                         label="Your City"
                         type="text"
-                        value={value}
+                        value={value || ""}
                         onChange={(e) => handleCityChange(e, index, value)}
                         fullWidth
                         variant="standard"
@@ -192,19 +230,19 @@ export default function Modal() {
                       }}
                     >
                       <div>
-                        <Button
-                          variant="contained"
-                          sx={{ p: 0.5 }}
-                          onClick={handleOpenContactInfo}
-                        >
-                          Add
-                        </Button>
+                        <IconButton aria-label="delete">
+                          <AddBoxRoundedIcon onClick={handleOpenContactInfo} />
+                        </IconButton>
                       </div>
                       &nbsp;
                       <div>
-                        <Button variant="contained" sx={{ p: 0.5 }}>
-                          Delete
-                        </Button>
+                        <IconButton aria-label="delete">
+                          <DeleteIcon
+                            fontSize="big"
+                            color="secondary"
+                            onClick={() => handleDelete(index)}
+                          />
+                        </IconButton>
                       </div>
                     </div>
                   </div>

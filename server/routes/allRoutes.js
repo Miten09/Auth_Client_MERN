@@ -15,5 +15,6 @@ client_route.post("/addclient", auth, clientController.allclient);
 client_route.get("/logout", clientController.logout);
 client_route.get("/showclient", auth, clientController.showclient);
 client_route.delete("/deleteclient/:id", auth, clientController.deleteClient);
+client_route.get("/editclient/:id", auth, clientController.editClient);
 
 module.exports = client_route;

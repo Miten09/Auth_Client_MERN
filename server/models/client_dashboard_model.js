@@ -16,16 +16,16 @@ const clientSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
-  phone: [
+  contact: [
     {
-      type: Number,
-      required: true,
-    },
-  ],
-  city: [
-    {
-      type: String,
-      required: true,
+      city: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: Number,
+        required: true,
+      },
     },
   ],
 });
