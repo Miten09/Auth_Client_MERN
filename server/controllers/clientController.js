@@ -141,6 +141,19 @@ const editClient = async (req, res) => {
   }
 };
 
+const updateClient = async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const updateClient = await ClientData.findByIdAndUpdate(_id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).send({ data: updateClient });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
 const logout = async (req, res) => {
   res.clearCookie("jwtoken", { path: "/" });
   res.status(201).json({
@@ -156,4 +169,5 @@ module.exports = {
   logout,
   deleteClient,
   editClient,
+  updateClient,
 };

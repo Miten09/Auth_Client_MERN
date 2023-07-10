@@ -79,13 +79,15 @@ export default function Modal({ show, close, open, data }) {
   }
 
   function handleContactChange(e, index) {
+    let name = e.target.name;
     let text = e.target.value;
     let dummy = clientData.contact;
     console.log(dummy);
-    dummy[index] = text;
+    dummy[index][name] = text;
     // setClientData.contact(() => [...dummy]);
 
     setClientData({
+      ...clientData,
       contact: [...dummy],
     });
   }
@@ -126,18 +128,41 @@ export default function Modal({ show, close, open, data }) {
     //   });
     // });
     setClientData({
+      ...clientData,
       contact: clientData.contact.filter((val, i) => {
         return index !== i;
       }),
     });
   }
 
+  async function handleUpdate(id) {
+    const { name, role, email, contact } = clientData;
+
+    const res = await fetch(`/api/updateclient/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        role,
+        email,
+        contact,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 400) {
+      window.alert("Email already exists Update to another one");
+    } else {
+      window.alert("Data Updated Successfully");
+      close();
+    }
+  }
+
   useEffect(() => {
-    if (data.length > 0) {
-      console.log(data);
+    if (data.length !== 0) {
       setClientData(data);
     }
-    console.log(data);
   }, [data]);
 
   return (
@@ -264,7 +289,13 @@ export default function Modal({ show, close, open, data }) {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSubmit}>Add Client</Button>
+          {data != 0 ? (
+            <Button onClick={() => handleUpdate(data._id)}>
+              Update Client
+            </Button>
+          ) : (
+            <Button onClick={handleSubmit}>Add Client</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>
