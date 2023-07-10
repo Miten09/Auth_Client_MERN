@@ -4,6 +4,42 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const ClientData = require("../models/client_dashboard_model");
+const randomstring = require("randomstring");
+const nodemailer = require("nodemailer");
+const config = require("../config");
+
+const sendResetPasswordMail = async (name, email, token) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      post: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: config.emailUser,
+        pass: config.emailPassword,
+      },
+    });
+
+    const mailOptions = {
+      from: config.emailUser,
+      to: email,
+      subject: "For Reset Password",
+      html: `<p>Hiii ${name} Please copy the link and<a href="http://localhost:3000/api/reset-password/${token}">Reset your password</a><p/>`,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Mail has been Sent :", info.response);
+      }
+    });
+  } catch (error) {
+    // res.send(400).send({ success: false, msg: error.message });
+    console.log(error);
+  }
+};
 
 const securePassword = async (password) => {
   try {
@@ -154,6 +190,78 @@ const updateClient = async (req, res) => {
   }
 };
 
+const forget_password = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(403).send({ err: "Plzz fill email" });
+    }
+    const userData = await User.findOne({ email: email });
+    if (userData) {
+      const randomString = randomstring.generate();
+      // console.log(randomString);
+      const data = await User.updateOne(
+        { email: email },
+        { $set: { token: randomString } }
+      );
+      sendResetPasswordMail(userData.name, userData.email, randomString);
+      res.status(200).send({
+        success: true,
+        msg: "Please check your inbox of mail and reset your password",
+      });
+    } else {
+      res
+        .status(402)
+        .send({ success: true, msg: "This email does not exists" });
+    }
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+};
+
+const reset_password_get = async (req, res) => {
+  try {
+    const token = req.params.token;
+    const tokenData = await User.findOne({ token });
+    if (tokenData) {
+      res.status(200).send({ msg: "tokenGet" });
+    } else {
+      res
+        .status(400)
+        .send({ success: false, msg: "This link has been expired." });
+    }
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+};
+
+const reset_password_post = async (req, res) => {
+  try {
+    const token = req.params.token;
+    const tokenData = await User.findOne({ token });
+    if (tokenData) {
+      const password = req.body.password;
+      const newPassword = await securePassword(password);
+      const userData = await User.findByIdAndUpdate(
+        { _id: tokenData._id },
+        { $set: { password: newPassword, token: "" } },
+        { new: true }
+      );
+      res.status(200).send({
+        success: true,
+        msg: "User password has been reset",
+        data: userData,
+      });
+    } else {
+      res
+        .status(400)
+        .send({ success: false, msg: "This link has been expired." });
+    }
+  } catch (error) {
+    res.status(400).send({ success: falsee, msg: error.message });
+  }
+};
+
 const logout = async (req, res) => {
   res.clearCookie("jwtoken", { path: "/" });
   res.status(201).json({
@@ -170,4 +278,7 @@ module.exports = {
   deleteClient,
   editClient,
   updateClient,
+  forget_password,
+  reset_password_get,
+  reset_password_post,
 };

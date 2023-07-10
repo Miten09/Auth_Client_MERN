@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Button, Typography } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
+import Link from "@mui/material/Link";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,6 +42,34 @@ const Login = () => {
       navigate("/client");
     }
   }
+
+  async function handleForgetClick() {
+    try {
+      const { email } = loginData;
+      const res = await fetch("/api/forget-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (res.status === 402) {
+        window.alert("This email does not exists");
+      } else if (res.status === 403) {
+        window.alert("Plzz Enter Your email ");
+      } else {
+        window.alert("Please check your inbox of mail and reset your password");
+        setLoginData({ email: "" });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
       <Box
@@ -101,15 +130,24 @@ const Login = () => {
               style: { color: "blue" },
             }}
           />
-          <Button
-            variant="contained"
-            color="success"
-            sx={{ mt: 2, mr: 17 }}
-            onClick={handleClick}
-          >
-            Sign In
-          </Button>
-          <Typography variant="h8" sx={{ mt: 2 }}>
+          <div style={{ display: "flex" }}>
+            <div>
+              <Button variant="contained" color="success" onClick={handleClick}>
+                Sign In
+              </Button>
+            </div>
+            <div>
+              <Link
+                component="button"
+                variant="body2"
+                sx={{ ml: 3, mt: 1 }}
+                onClick={handleForgetClick}
+              >
+                Forgot Password ?
+              </Link>
+            </div>
+          </div>
+          <Typography variant="h8" sx={{ mt: 3 }}>
             Don't Have an Account? <NavLink to="/register">Sign Up</NavLink>
           </Typography>
         </div>
