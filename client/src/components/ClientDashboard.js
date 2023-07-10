@@ -100,7 +100,7 @@ const ClientDashboard = () => {
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell sx={{ pl: 8 }}>Name</StyledTableCell>
+              <StyledTableCell align="center">Name</StyledTableCell>
               <StyledTableCell align="center">Role</StyledTableCell>
               <StyledTableCell align="center">Email</StyledTableCell>
               <StyledTableCell align="center">Contact Info</StyledTableCell>
@@ -110,28 +110,28 @@ const ClientDashboard = () => {
           <TableBody>
             {state.map((val, index) => (
               <StyledTableRow key={index}>
-                <StyledTableCell component="th" scope="row" sx={{ pl: 6 }}>
+                <StyledTableCell align="center" component="th" scope="row">
                   {val.name}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {index + 1 == 0 ? "" : `${val.role}`}
                 </StyledTableCell>
                 <StyledTableCell align="center">{val.email}</StyledTableCell>
-                <StyledTableCell align="center">
+                <StyledTableCell align="center" sx={{ textAlign: "center" }}>
                   <div>
                     {val?.contact?.map((val, index) => {
                       return (
                         <div key={index}>
-                          <div style={{ display: "flex" }}>
-                            <p>{val.city}</p> &nbsp;&nbsp; &nbsp;&nbsp;
-                            <p>{val.phone}</p>
+                          <div>
+                            <span>{val.city}</span> &nbsp;&nbsp; &nbsp;&nbsp;
+                            <span>{val.phone}</span>
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 </StyledTableCell>
-                <Box textAlign="center">
+                <Box textAlign="center" sx={{ mt: 1 }}>
                   <Button
                     sx={{ p: 0.5 }}
                     color="secondary"
