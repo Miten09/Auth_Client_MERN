@@ -39,7 +39,12 @@ export default function Modal({ show, close, open, data }) {
   function handleOpenContactInfo() {
     // setPhone([...phone, ""]);
     // setCity([...city, ""]);
-    setClientData.contact([...clientData.contact, ""]);
+    // setClientData.contact([...clientData.contact, ""]);
+    console.log(clientData);
+    setClientData({
+      ...clientData,
+      contact: [...clientData.contact, {}],
+    });
   }
 
   function handleChange(e) {
@@ -76,9 +81,13 @@ export default function Modal({ show, close, open, data }) {
   function handleContactChange(e, index) {
     let text = e.target.value;
     let dummy = clientData.contact;
-
+    console.log(dummy);
     dummy[index] = text;
-    setClientData.contact(() => [...dummy]);
+    // setClientData.contact(() => [...dummy]);
+
+    setClientData({
+      contact: [...dummy],
+    });
   }
 
   // function handlephoneChange(e, index) {
@@ -111,21 +120,25 @@ export default function Modal({ show, close, open, data }) {
   // }
 
   function handleDelete(index) {
-    setClientData.contact((olditems) => {
-      return clientData.contact.filter((val, i) => {
+    // setClientData.contact((olditems) => {
+    //   return clientData.contact.filter((val, i) => {
+    //     return index !== i;
+    //   });
+    // });
+    setClientData({
+      contact: clientData.contact.filter((val, i) => {
         return index !== i;
-      });
+      }),
     });
   }
 
   useEffect(() => {
-    handleOpenContactInfo();
     if (data.length > 0) {
+      console.log(data);
       setClientData(data);
     }
-  }, []);
-
-  console.log(data);
+    console.log(data);
+  }, [data]);
 
   return (
     <div>
@@ -155,7 +168,7 @@ export default function Modal({ show, close, open, data }) {
               labelId="demo-simple-select-label"
               id="role"
               name="role"
-              value={clientData.role || ""}
+              value={clientData.role || []}
               onChange={handleChange}
               label="Your Role"
               sx={{ width: { sm: 400 }, p: 1 }}
@@ -181,71 +194,70 @@ export default function Modal({ show, close, open, data }) {
           />
           <h3>Contact Info:</h3>
           <div style={{ display: "flex" }}>
-            <div>
-              {phone.map((value, index) => {
-                return (
-                  <div key={index}>
-                    <TextField
-                      autoFocus
-                      sx={{ p: 1 }}
-                      margin="dense"
-                      id="phone"
-                      name="phone"
-                      label="Phone Number"
-                      type="Number"
-                      value={value}
-                      onChange={(e) => handlephoneChange(e, index, value)}
-                      fullWidth
-                      variant="standard"
-                    />
-                  </div>
-                );
-              })}
-            </div>
             &nbsp;&nbsp; &nbsp;&nbsp;
             <div>
-              {city.map((value, index) => {
+              {clientData.contact.map((value, index) => {
                 return (
-                  <div style={{ display: "flex" }}>
-                    <div key={index}>
-                      <TextField
-                        autoFocus
-                        sx={{ p: 1 }}
-                        margin="dense"
-                        id="city"
-                        name="city"
-                        label="Your City"
-                        type="text"
-                        value={value || ""}
-                        onChange={(e) => handleCityChange(e, index, value)}
-                        fullWidth
-                        variant="standard"
-                      />
-                    </div>
-                    <div
-                      style={{
-                        marginTop: "30px",
-                        marginLeft: "25px",
-                        display: "flex",
-                      }}
-                    >
+                  <React.Fragment key={index}>
+                    <div style={{ display: "flex" }}>
                       <div>
-                        <IconButton aria-label="delete">
-                          <AddBoxRoundedIcon onClick={handleOpenContactInfo} />
-                        </IconButton>
+                        <TextField
+                          autoFocus
+                          sx={{ p: 1 }}
+                          margin="dense"
+                          id="phone"
+                          name="phone"
+                          label="Your Phone"
+                          type="Number"
+                          value={value.phone || ""}
+                          onChange={(e) => handleContactChange(e, index, value)}
+                          fullWidth
+                          variant="standard"
+                        />
                       </div>
-                      &nbsp;
+                      &nbsp;&nbsp;&nbsp;&nbsp;
                       <div>
-                        <IconButton aria-label="delete">
-                          <DeleteIcon
-                            fontSize="big"
-                            color="secondary"
+                        <TextField
+                          autoFocus
+                          sx={{ p: 1 }}
+                          margin="dense"
+                          id="city"
+                          name="city"
+                          label="Your City"
+                          type="text"
+                          value={value.city || ""}
+                          onChange={(e) => handleContactChange(e, index, value)}
+                          fullWidth
+                          variant="standard"
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "30px",
+                          marginLeft: "25px",
+                          display: "flex",
+                        }}
+                      >
+                        <div>
+                          <IconButton
+                            aria-label="delete"
+                            onClick={handleOpenContactInfo}
+                          >
+                            <AddBoxRoundedIcon />
+                          </IconButton>
+                        </div>
+                        &nbsp;
+                        <div>
+                          <IconButton
+                            aria-label="delete"
                             onClick={() => handleDelete(index)}
-                          />
-                        </IconButton>
+                          >
+                            <DeleteIcon fontSize="big" color="secondary" />
+                          </IconButton>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </React.Fragment>
                 );
               })}
             </div>

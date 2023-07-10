@@ -109,9 +109,7 @@ const ClientDashboard = () => {
           </TableHead>
           <TableBody>
             {state.map((val, index) => (
-              <StyledTableRow key={val.name}>
-                {/* {console.log(index)} */}
-                {console.log(val.contact)}
+              <StyledTableRow key={index}>
                 <StyledTableCell component="th" scope="row" sx={{ pl: 6 }}>
                   {val.name}
                 </StyledTableCell>
@@ -123,9 +121,11 @@ const ClientDashboard = () => {
                   <div>
                     {val?.contact?.map((val, index) => {
                       return (
-                        <div style={{ display: "flex" }}>
-                          <p>{val.city}</p> &nbsp;&nbsp; &nbsp;&nbsp;
-                          <p>{val.phone}</p>
+                        <div key={index}>
+                          <div style={{ display: "flex" }}>
+                            <p>{val.city}</p> &nbsp;&nbsp; &nbsp;&nbsp;
+                            <p>{val.phone}</p>
+                          </div>
                         </div>
                       );
                     })}
