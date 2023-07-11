@@ -7,16 +7,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   const token = useParams();
-
-  const resetPass = async () => {
-    const res = await fetch(`/api/reset-password/${token}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-  };
+  console.log(token);
 
   const resetPassPost = async () => {
     console.log(token.token);
@@ -31,14 +22,33 @@ const ResetPassword = () => {
     });
     const data = await res.json();
     console.log(data);
-    if (data) {
+    if (res.status !== 200) {
+      window.alert("Link has been expired");
+      navigate("/login");
+    } else {
       window.alert("Password Reset successfully");
       navigate("/login");
     }
   };
 
+  const getRestpass = async () => {
+    const res = await fetch(`/api/forget-password/${token.token}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    console.log(res);
+    if (res.status === 200) {
+      console.log("valid user");
+    } else {
+      navigate("*");
+    }
+  };
+
   useEffect(() => {
-    resetPass();
+    getRestpass();
   }, []);
 
   return (

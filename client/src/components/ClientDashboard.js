@@ -123,7 +123,8 @@ const ClientDashboard = () => {
                       return (
                         <div key={index}>
                           <div>
-                            <span>{val.city}</span> &nbsp;&nbsp; &nbsp;&nbsp;
+                            <span>{val.city}</span>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <span>{val.phone}</span>
                           </div>
                         </div>

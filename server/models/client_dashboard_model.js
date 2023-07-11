@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require("./register_model");
 
 const clientSchema = mongoose.Schema({
   name: {
@@ -28,6 +29,10 @@ const clientSchema = mongoose.Schema({
       },
     },
   ],
+  clientid: {
+    type: String,
+    id: User._id,
+  },
 });
 
 module.exports = mongoose.model("ClientData", clientSchema);

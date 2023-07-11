@@ -18,7 +18,10 @@ client_route.delete("/deleteclient/:id", auth, clientController.deleteClient);
 client_route.get("/editclient/:id", auth, clientController.editClient);
 client_route.patch("/updateclient/:id", auth, clientController.updateClient);
 client_route.post("/forget-password", clientController.forget_password);
-client_route.get("/reset-password/:token", clientController.reset_password_get);
+client_route.get(
+  "/forget-password/:token",
+  clientController.forget_password_get
+);
 client_route.post(
   "/reset-password-post/:token",
   clientController.reset_password_post
